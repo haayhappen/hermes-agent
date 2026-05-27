@@ -224,7 +224,7 @@ RUN mkdir -p /opt/data
 # We use the ENTRYPOINT+CMD split rather than CMD alone so the
 # wrapper is prepended to user-supplied args automatically:
 #
-#   docker run <image>                  → /init main-wrapper.sh   (CMD default)
+#   docker run <image>                  → /init main-wrapper.sh gateway run
 #   docker run <image> chat -q "hi"     → /init main-wrapper.sh chat -q hi
 #   docker run <image> sleep infinity   → /init main-wrapper.sh sleep infinity
 #   docker run <image> --tui            → /init main-wrapper.sh --tui
@@ -235,4 +235,4 @@ RUN mkdir -p /opt/data
 # exit code. Without the wrapper-as-ENTRYPOINT, leading-dash args
 # like `--version` would be intercepted by /init's POSIX shell.
 ENTRYPOINT [ "/init", "/opt/hermes/docker/main-wrapper.sh" ]
-CMD [ ]
+CMD [ "gateway", "run" ]
