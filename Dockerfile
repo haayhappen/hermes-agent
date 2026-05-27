@@ -88,17 +88,11 @@ COPY --chown=hermes:hermes . .
 RUN cd web && npm run build && \
     cd ../ui-tui && npm run build
 
-# ---------- Permissions ----------
-# Source copied above is already hermes-owned. Avoid a full-tree chmod/chown:
-# Railway cold builds spend minutes walking .venv, node_modules, and web assets.
-# Only the lazy-install/runtime dependency directories need write ownership.
-# The .venv MUST remain hermes-writable so lazy_deps.py can install
-# remaining optional platform packages and future pin bumps at first use.
-# Without this, `uv pip install` fails with EACCES and adapters silently
-# fail to load.  See tools/lazy_deps.py.
+# ---------- Runtime user ----------
+# Source copied above is already hermes-owned, and dependency trees are
+# root-readable. Avoid recursive build-time chmod/chown: Railway cold builds
+# spend minutes walking .venv, node_modules, and generated web assets.
 USER root
-RUN chown -R hermes:hermes /opt/hermes/.venv /opt/hermes/node_modules /opt/hermes/ui-tui/node_modules && \
-    chown hermes:hermes /opt/hermes/ui-tui /opt/hermes/ui-tui/package.json /opt/hermes/ui-tui/package-lock.json
 # Start as root so the entrypoint can usermod/groupmod + gosu.
 # If HERMES_UID is unset, the entrypoint drops to the default hermes user (10000).
 
